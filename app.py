@@ -6,6 +6,7 @@ from config.config import Config
 from User.model import db, User
 from sqlalchemy import inspect, text  # Thêm import 'inspect' từ sqlalchemy
 from User.route import user_bp 
+from Attendance.route import attendance_bp
 
 # Load .env variables
 load_dotenv()
@@ -52,6 +53,7 @@ def debug_add_users():
 
     
 app.register_blueprint(user_bp, url_prefix='/api')
+app.register_blueprint(attendance_bp, url_prefix='/api')
 
 if __name__ == "__main__":
     host = os.getenv("FLASK_RUN_HOST", "127.0.0.1")
