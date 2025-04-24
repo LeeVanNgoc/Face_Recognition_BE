@@ -6,14 +6,14 @@ def create_attendance():
     data = request.get_json()  # Lấy dữ liệu từ request body
 
     # Kiểm tra xem các trường cần thiết có mặt không
-    if not data or not data.get('userId') or not data.get('timeCheck') or not data.get('typeCheck'):
+    if not data or not data.get('userId') or not data.get('timeAtten') or not data.get('image'):
         return jsonify({"message": "Missing data"}), 400
 
     # Tạo một bản ghi chấm công mới
     new_attendance = Attendance(
         userId=data['userId'],
-        timeCheck=data['timeCheck'],
-        typeCheck=data['typeCheck']
+        timeAtten=data['timeAtten'],
+        image=data['image']
     )
 
     try:
@@ -24,8 +24,8 @@ def create_attendance():
             "attendance": {
                 "id": new_attendance.id,
                 "userId": new_attendance.userId,
-                "timeCheck": new_attendance.timeCheck,
-                "typeCheck": new_attendance.typeCheck
+                "timeAtten": new_attendance.timeAtten,
+                "image": new_attendance.image
             }
         }), 201
     except Exception as e:
@@ -40,8 +40,8 @@ def get_all_attendances():
         return jsonify([{
             'id': attendance.id,
             'userId': attendance.userId,
-            'timeCheck': attendance.timeCheck,
-            'typeCheck': attendance.typeCheck
+            'timeAtten': attendance.timeAtten,
+            'image': attendance.image
         } for attendance in attendances]), 200
     else:
         return jsonify({"message": "No attendances found"}), 404
@@ -54,8 +54,8 @@ def get_attendance_by_user(user_id):
         return jsonify([{
             'id': attendance.id,
             'userId': attendance.userId,
-            'timeCheck': attendance.timeCheck,
-            'typeCheck': attendance.typeCheck
+            'timeAtten': attendance.timeAtten,
+            'image': attendance.image
         } for attendance in attendances]), 200
     else:
         return jsonify({"message": "No attendances found for this user"}), 404
@@ -72,10 +72,10 @@ def update_attendance(attendance_id):
 
     if data.get('userId'):
         attendance.userId = data['userId']
-    if data.get('timeCheck'):
-        attendance.timeCheck = data['timeCheck']
-    if data.get('typeCheck') is not None:
-        attendance.typeCheck = data['typeCheck']
+    if data.get('timeAtten'):
+        attendance.timeAtten = data['timeAtten']
+    if data.get('image') is not None:
+        attendance.image = data['image']
 
     try:
         db.session.commit()  # Cập nhật vào DB
@@ -84,8 +84,8 @@ def update_attendance(attendance_id):
             'attendance': {
                 'id': attendance.id,
                 'userId': attendance.userId,
-                'timeCheck': attendance.timeCheck,
-                'typeCheck': attendance.typeCheck
+                'timeAtten': attendance.timeAtten,
+                'image': attendance.image
             }
         }), 200
     except Exception as e:

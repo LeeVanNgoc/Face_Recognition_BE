@@ -1,11 +1,19 @@
+from datetime import datetime
 from config.config import db
+
 class User(db.Model):
     __tablename__ = 'user'  # 👉 tên bảng trong DB (tùy chọn, nếu không thì mặc định là `user`)
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(120), unique=True)
-    phone = db.Column(db.String(120), unique=True)
+    createdAt = db.Column(db.DateTime, default=datetime.utcnow)
+    updatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    fullName = db.Column(db.String(500))
+    gender = db.Column(db.String(1))
+    email = db.Column(db.String(500), unique=True)
+    password = db.Column(db.String(500), nullable=True)
+    phone = db.Column(db.String(20), unique=True)
+    address = db.Column(db.String(500))
+    image = db.Column(db.Text)
 
     @classmethod
     def get_all_users(cls):
