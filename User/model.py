@@ -1,5 +1,5 @@
 from datetime import datetime
-from config.config import db
+from config import db
 
 class User(db.Model):
     __tablename__ = 'user'  # 👉 tên bảng trong DB (tùy chọn, nếu không thì mặc định là `user`)

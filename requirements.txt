@@ -4,3 +4,11 @@ python-dotenv
 Flask-SQLAlchemy
 SQLAlchemy
 pymysql
+opencv-python
+opencv-python-headless
+insightface
+numpy
+scipy
+requests
+gunicorn
+onnxruntime

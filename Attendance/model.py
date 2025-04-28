@@ -1,5 +1,5 @@
 from datetime import datetime
-from config.config import db
+from config import db
 
 class Attendance(db.Model):
     __tablename__ = 'attendance'  # Tên bảng trong DB (tùy chọn, nếu không thì mặc định là tên lớp)

@@ -2,11 +2,13 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-from config.config import Config
+from config import Config
 from User.model import db, User
-from sqlalchemy import inspect, text  # Thêm import 'inspect' từ sqlalchemy
-from User.route import user_bp 
+from sqlalchemy import inspect, text
+from User.route import user_bp
 from Attendance.route import attendance_bp
+from recognition.routes import recognition_bp
+import numpy as np
 
 # Load .env variables
 load_dotenv()
@@ -18,25 +20,22 @@ app.config.from_object(Config)
 CORS(app)
 
 # Kết nối Flask với SQLAlchemy
-db.init_app(app)  # Đảm bảo db.init_app(app) được gọi sau khi tạo ứng dụng Flask
+db.init_app(app)
 
-# Thay vì sử dụng `before_first_request`, bạn sẽ sử dụng `before_request`
 @app.before_request
 def create_tables():
-    # Sử dụng inspect để kiểm tra bảng 'user' có tồn tại không
-    inspector = inspect(db.engine)  # Tạo đối tượng inspector từ engine
-    if 'user' not in inspector.get_table_names():  # Kiểm tra nếu bảng 'user' không có
-        db.create_all()  # Tạo bảng nếu chưa có
+    inspector = inspect(db.engine)
+    if 'user' not in inspector.get_table_names():
+        db.create_all()
 
 @app.route("/test-db")
 def test_db():
     try:
-        # Đảm bảo câu truy vấn được bao bọc bởi text()
-        db.session.execute(text('SELECT 1'))  # Phải sử dụng text() như thế này
+        db.session.execute(text('SELECT 1'))
         return jsonify({"status": "OK"})
     except Exception as e:
         return jsonify({"status": "Error", "message": str(e)})
-    
+
 @app.route("/api/debug_users")
 def debug_users():
     users = User.query.all()
@@ -46,14 +45,13 @@ def debug_users():
 def debug_add_users():
     user1 = User(id="1", name="Aozama", email="lee.admin@gmail.com", phone="1")
     user2 = User(id="2", name="Aozama 2", email="lee.admin@gmail.com", phone="0934287342")
-    user3 = User(id="3", name="Aozama3", email="lee.admin3@gmail.com", phone="0934287342")
-    db.session.add_all([user1, user2, user3])
+    db.session.add_all([user1, user2])
     db.session.commit()
-    return "3 users added"
+    return "Users added"
 
-    
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(attendance_bp, url_prefix='/api')
+app.register_blueprint(recognition_bp, url_prefix='/api')
 
 if __name__ == "__main__":
     host = os.getenv("FLASK_RUN_HOST", "127.0.0.1")
