@@ -31,19 +31,13 @@ def load_database():
 def recognize(embedding):
     faces_db, names_db = load_database()
     threshold = 0.6  # Ngưỡng để nhận diện
-    print("faces_db đã lấy:", len(faces_db))
-    print("Embedding đã lấy:", embedding.shape)
 
     # Kiểm tra kiểu dữ liệu của từng embedding trong faces_db
     for i, (db_embedding, name) in enumerate(zip(faces_db, names_db)):
-        print(f"Embedding {i} trong faces_db có kiểu dữ liệu: {type(db_embedding)}")
         
         if isinstance(db_embedding, tuple):
-            print(f"Embedding {i} là tuple, chuyển đổi thành NumPy array.")
-            db_embedding = np.array(db_embedding)  # Chuyển tuple thành NumPy array
-            print(f"Embedding {i} trong faces_db có kích thước: {db_embedding.shape}")
+            db_embedding = db_embedding[0]  # Chuyển tuple thành NumPy array
         
-        print(f"Embedding {i} trong faces_db có kích thước: {db_embedding.shape}")
         
         similarity = cosine_similarity(embedding, db_embedding)
         if similarity > threshold:  # Nếu độ tương đồng đủ cao, trả về tên
