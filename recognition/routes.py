@@ -6,6 +6,8 @@ from .detector import get_embedding
 from .matcher import find_best_match
 from .database import load_database
 from .database import save_to_database
+from Attendance.model import Attendance
+from config import db
 
 recognition_bp = Blueprint('recognition', __name__)
 
@@ -29,9 +31,24 @@ def recognize_face():
         embedding, name = get_embedding(image)  # Lấy embedding và tên từ hàm get_embedding
 
         if embedding is not None:
-            # Trả về tên và embedding
-            response = {'status': 'success', 'name': name, 'embedding': embedding.tolist()}
-            return jsonify(response)
+            if name != "Unknown":
+                # Chống chấm trùng trong ngày
+                from datetime import datetime
+                existing = Attendance.query.filter_by(userId=name, timeAtten=datetime.now()).first()
+                if not existing:
+                    new_attendance = Attendance(
+                        userId=name,
+                        timeAtten=datetime.now(),
+                        image=image_data
+                    )
+                    db.session.add(new_attendance)
+                    db.session.commit()
+
+            return jsonify({
+                'status': 'success',
+                'name': name,
+                'embedding': embedding.tolist()
+            })
         else:
             return jsonify({'status': 'error', 'message': 'No face detected'})
 
