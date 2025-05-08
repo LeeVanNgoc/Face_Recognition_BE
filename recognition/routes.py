@@ -34,7 +34,8 @@ def recognize_face():
 
         if embedding is not None:
             from datetime import datetime
-
+            if embedding is None or name == 'Unknown':
+                return jsonify({'status': 'error', 'message': 'Face not recognized'})
             new_attendance = Attendance(
                 userId=name,
                 timeAtten=datetime.now(),
