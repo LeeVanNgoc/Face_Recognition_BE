@@ -6,7 +6,9 @@ from .detector import get_embedding
 from .matcher import find_best_match
 from .database import load_database
 from .database import save_to_database
+from sqlalchemy import and_, func
 from Attendance.model import Attendance
+from User.model import User
 from config import db
 
 recognition_bp = Blueprint('recognition', __name__)
@@ -31,24 +33,39 @@ def recognize_face():
         embedding, name = get_embedding(image)  # Lấy embedding và tên từ hàm get_embedding
 
         if embedding is not None:
-            if name != "Unknown":
-                # Chống chấm trùng trong ngày
-                from datetime import datetime
-                existing = Attendance.query.filter_by(userId=name, timeAtten=datetime.now()).first()
-                if not existing:
-                    new_attendance = Attendance(
-                        userId=name,
-                        timeAtten=datetime.now(),
-                        image=image_data
-                    )
-                    db.session.add(new_attendance)
-                    db.session.commit()
+            from datetime import datetime
 
-            return jsonify({
-                'status': 'success',
-                'name': name,
-                'embedding': embedding.tolist()
-            })
+            new_attendance = Attendance(
+                userId=name,
+                timeAtten=datetime.now(),
+                image=image_data
+            )
+            db.session.add(new_attendance)
+            db.session.commit()
+            if name != "Unknown":
+                user = User.query.filter_by(id=name).first()
+                print('Boss user', user)
+                if user:
+                # Trả về thông tin người dùng
+                    return jsonify({
+                        'status': 'success',
+                        'user': {
+                            'id': user.id,
+                            'fullName': user.fullName,
+                            'email': user.email,
+                            'phone': user.phone,
+                            'gender': user.gender,
+                            'address': user.address,
+                            'image': user.image
+                        },
+                        'embedding': embedding.tolist()
+                    })
+                else :
+                    return jsonify({
+                        'status': 'success',
+                        'name': name,
+                        'embedding': embedding.tolist()
+                    })
         else:
             return jsonify({'status': 'error', 'message': 'No face detected'})
 

@@ -4,7 +4,7 @@ from config import db
 class Attendance(db.Model):
     __tablename__ = 'attendance'  # Tên bảng trong DB (tùy chọn, nếu không thì mặc định là tên lớp)
 
-    id = db.Column(db.Integer, primary_key=True)  # Khóa chính
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Khóa chính
     createdAt = db.Column(db.DateTime, default=datetime.utcnow)
     updatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     userId = db.Column(db.String(36))  # userId, kiểu dữ liệu là String

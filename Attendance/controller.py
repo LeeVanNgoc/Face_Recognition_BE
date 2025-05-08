@@ -40,7 +40,7 @@ def get_all_attendances():
         return jsonify([{
             'id': attendance.id,
             'userId': attendance.userId,
-            'timeAtten': attendance.timeAtten,
+            'timeAtten': attendance.timeAtten.isoformat(),
             'image': attendance.image
         } for attendance in attendances]), 200
     else:
@@ -49,12 +49,12 @@ def get_all_attendances():
 
 # Flask API: Lấy danh sách chấm công của một người dùng theo userId
 def get_attendance_by_user(user_id):
-    attendances = Attendance.query.filter_by(userId=user_id).all()  # Lọc theo userId
+    attendances = Attendance.query.filter_by(userId=user_id).all()
     if attendances:
         return jsonify([{
             'id': attendance.id,
             'userId': attendance.userId,
-            'timeAtten': attendance.timeAtten,
+            'timeAtten': attendance.timeAtten.isoformat(),
             'image': attendance.image
         } for attendance in attendances]), 200
     else:
@@ -84,7 +84,7 @@ def update_attendance(attendance_id):
             'attendance': {
                 'id': attendance.id,
                 'userId': attendance.userId,
-                'timeAtten': attendance.timeAtten,
+                'timeAtten': attendance.timeAtten.isoformat(),
                 'image': attendance.image
             }
         }), 200
