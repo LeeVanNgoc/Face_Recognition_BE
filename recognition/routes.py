@@ -71,6 +71,55 @@ def recognize_face():
 
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
+    
+@recognition_bp.route('/recognize/automatic', methods=['POST'])
+def recognize_face_automatic():
+    data = request.get_json()
+    image_data = data.get('image')  # Nhận dữ liệu hình ảnh base64 từ frontend
+
+    try:
+        image = decode_base64_image(image_data)  # Giải mã ảnh base64 thành numpy array
+        embedding, name = get_embedding(image)  # Lấy embedding và tên từ hàm get_embedding
+
+        if embedding is not None:
+            from datetime import datetime
+
+            new_attendance = Attendance(
+                userId=name,
+                timeAtten=datetime.now(),
+                image=image_data
+            )
+            db.session.add(new_attendance)
+            db.session.commit()
+            if name != "Unknown":
+                user = User.query.filter_by(id=name).first()
+                print('Boss user', user)
+                if user:
+                # Trả về thông tin người dùng
+                    return jsonify({
+                        'status': 'success',
+                        'user': {
+                            'id': user.id,
+                            'fullName': user.fullName,
+                            'email': user.email,
+                            'phone': user.phone,
+                            'gender': user.gender,
+                            'address': user.address,
+                            'image': user.image
+                        },
+                        'embedding': embedding.tolist()
+                    })
+                else :
+                    return jsonify({
+                        'status': 'success',
+                        'name': name,
+                        'embedding': embedding.tolist()
+                    })
+        else:
+            return jsonify({'status': 'error', 'message': 'No face detected'})
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
 
 
 @recognition_bp.route('/enroll', methods=['POST'])
